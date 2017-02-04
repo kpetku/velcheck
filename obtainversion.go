@@ -20,5 +20,5 @@ func obtainVersion(input string) (string, error) {
 			return "", err
 		}
 	}
-	return "", errors.New("Missing version information")
+	return "", errors.New("Missing version information: " + input)
 }

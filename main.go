@@ -1,18 +1,17 @@
 package main
 
 import (
-	"log"
-	"os"
+	"flag"
 )
 
 func main() {
+	feed := flag.String("feed", "https://vel.myjoomla.io/", "URL or full path to file containing a Joomla! Extensions Directory JSON feed")
+	vhost := flag.String("vhost", "/mnt/data/vhosts/", "Location of the folder that contains websites")
+	docroot := flag.String("docroot", "httpdocs", "Name of the folder (like httpdocs, htdocs, or public_html) containing an installation of Joomla!")
+
+	flag.Parse()
+
 	v := &Vel{}
-	if len(os.Args) > 1 {
-		v.New(os.Args[1])
-	} else {
-		log.Printf("not enough arguments: ./velcheck http://example.org/file.json or ./velcheck file.json -- using https://vel.myjoomla.io as default.")
-		v.New("https://vel.myjoomla.io")
-	}
-	v.Marshall()
-	v.ScanVhosts()
+	v.New(*feed)
+	v.Scan(*vhost, *docroot)
 }

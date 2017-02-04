@@ -10,35 +10,43 @@ import (
 	"time"
 )
 
+var Version string = "v0.2"
 var mutex = &sync.Mutex{}
 
 var VelMap map[string]string
 
-func (v *Vel) New(s string) *Vel {
-	if strings.HasPrefix(s, "http") {
+func (v *Vel) New(json string) *Vel {
+	log.Printf("velcheck " + Version + " by Keith Petkus <keith@keithp.net> loaded")
+
+	if strings.HasPrefix(json, "http") {
 		var c = &http.Client{
 			Timeout: time.Second * 10,
 		}
-		req, err := http.NewRequest("GET", s, nil)
-		req.Header.Add("User-Agent", "joomla-velcheck 0.1 author: keith@keithp.net")
+		req, err := http.NewRequest("GET", json, nil)
+		req.Header.Add("User-Agent", "velcheck "+Version+" author: keith@keithp.net")
 		resp, err := c.Do(req)
 		if err != nil {
-			log.Fatalf("Could not load %s: %s", s, err.Error())
+			log.Fatalf("Unable to obtain source %s: %s", json, err.Error())
 		}
-		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalf("Error retrieving json feed %s: %s", json, err.Error())
+		}
 		v.Raw = body
+		resp.Body.Close()
+		v.marshall()
 		return v
 	}
-	raw, err := ioutil.ReadFile(s)
+	raw, err := ioutil.ReadFile(json)
 	if err != nil {
-		log.Fatalf("Could not load %s: %s", s, err.Error())
+		log.Fatalf("Unable to obtain source %s: %s", json, err.Error())
 	}
 	v.Raw = raw
+	v.marshall()
 	return v
 }
 
-func (v *Vel) Marshall() *Vel {
+func (v *Vel) marshall() *Vel {
 	mutex.Lock()
 	// Actually marshall the data from JSON
 	j := &JsonVel{}

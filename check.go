@@ -23,7 +23,7 @@ func (v *Vel) check(name string, version string) (bool, string, error) {
 							continue
 						}
 						if lessThan {
-							return true, v.Json.Data[i].Version_effected + " published " + v.Json.Data[i].Published_date + " " + v.Json.Data[i].Official_vel_link, nil
+							return true, v.Json.Data[i].Version_effected + " was published " + v.Json.Data[i].Published_date + " " + v.Json.Data[i].Official_vel_link, nil
 						}
 					}
 				} else {

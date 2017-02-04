@@ -6,13 +6,14 @@ import (
 	"os"
 )
 
-func (v *Vel) ScanVhosts() {
-	virtualHostLocation := "/mnt/data/vhosts/"
-	directories, _ := ioutil.ReadDir(virtualHostLocation)
-	documentRoot := "httpdocs"
-
+func (v *Vel) Scan(virtualHostLocation, documentRoot string) {
+	var results int
 	var suffix, pwd string
 
+	directories, err := ioutil.ReadDir(virtualHostLocation)
+	if err != nil {
+		log.Fatalf("Unable to read %s: %s", virtualHostLocation, err.Error())
+	}
 	for _, vhost := range directories {
 		for extension := range VelMap {
 			switch extension[0:3] {
@@ -37,8 +38,10 @@ func (v *Vel) ScanVhosts() {
 				}
 				if found {
 					log.Printf("WARNING: %s has %s version %s installed: %s", vhost.Name(), extension, installedVersion, info)
+					results++
 				}
 			}
 		}
 	}
+	log.Printf("Found: %d result(s)", results)
 }
